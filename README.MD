@@ -44,3 +44,50 @@
 Signer | Một chương trình kí hiệu gói chứng thực hostbased. |
 | Random seed | Một dãy dữ liệu ngẫu nhiên đựoc dùng bởi các thành phần SSH để khởi chạy phần mềm sinh số ngẫu nhiên |
 | Configuration file | Một chồng thiết lập để biến đổi hành vi của một SSH client hoặc SSH server. Không phải tất cả thành phần đều được đòi hỏi trong một bản bổ sung của SSH. Dĩ nhiên những server, client và khoá là bắt buộc nhưng nhiều bản bổ sung không có agent và thậm chí vài bản không có bộ sinh khoá. |
+
+### 4. Cơ chế hoạt động
+
+**Một phiên làm việc của SSH2 đều phải trải qua 4 bước**
+
+- Thiết lập kết nối ban đầu (SSH-TRANS)
+- Tiến hành xác thực (SSH-AUTH)
+- Mở phiên kết nối để thực hiện các dịch vụ (SSH-CONN)
+- Chạy các ứng dụng SSH (Có thể là SSH-SFTP, SCP)
+
+**SSH-TRANS**: là khối xây dựng cơ bản cung cấp kết nối ban đầu, ghi chép giao thức, xác thực server, mã hóa cơ bản và bảo toàn dữ liệu. Sau khi thiết lập kết nối, client có một kết nối độc lập và bảo mật
+
+Sau đó, client dùng SSH-AUTH để xác thực đến server. SSH-AUTH yêu cầu một phương thức: Public key với thuật toán DSS. Ngoài ra, sử dụng mật khẩu và hostbased
+
+Sau khi xác thực, SSH client yêu cầu SSH-CONN để cung cấp một kênh riêng biệt qua SSH-TRANS
+
+Ngoài ra, còn cung cấp các dịch vụ như Remote Login and Command Execution, agent fowarding, files transfer, TCP port fowarding, X fowarding,...
+
+Cuối cùng, một ứng dụng có thể sử dụng SSH-SFTP hoặc SCP truyền file hoặc thao tác remote từ xa
+
+### 5. Một số thuật toán trong SSH
+
+#### Thuật toán Public-keys (Khóa công khai)
+
+- RSA: là thuật toán mã hóa bất đối xứng, dùng cho mã hóa và chữ ký
+- DSA: dùng chữ ký số
+- Thuật toán thỏa thuận Diffie-Hellman: cho phép 2 bên lấy được khóa được chia sẻ trên một kênh mở
+
+#### Thuật toán Private-keys (Khóa bí mật)
+
+- AES: là một thuật toán mã hóa khối, chiều dài có thể là 128 đến 256bit.
+- DES: là một thuật toán mã hóa bảo mật
+- 3DES: cải tiến của DES, tăng độ dài của khóa để đạt độ bảo mật cao hơn
+- RC4: Kiểu mã hóa nhanh, nhưng kém bảo mật
+- Blowfish: là một thuật toán mã hóa miễn phí, có tốc độ mã hóa nhanh hơn DES, nhưng chậm hơn RC4. Độ dài của key từ 32 đến 448bit.
+
+#### Hàm băm (HASH)
+
+- CRS-32: Băm dữ liệu nhưng không mã hóa. Chỉ sử dụng để kiểm tra tính toàn vẹn của gói tin, tránh thay đổi thông tin trên đường truyền
+- MD5: Hàm băm có độ an toàn cao vì được mã hóa dữ liệu, với chiều dài là 128bit.
+- SHA-1: Một cải tiến của MD5, với chiều dài là 160bit.
+
+### 6. Tham khảo:
+
+- https://github.com/huynt2016/SSH/blob/master/ssh.md
+- https://github.com/kieulam141/SSH/blob/master/LyThuyet.md#1
+- http://sinhvienit.net/forum/chuyen-de-tim-hieu-ssh.10058.html
